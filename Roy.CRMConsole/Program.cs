@@ -8,6 +8,7 @@ using Microsoft.Xrm.Tooling.Connector;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Crm.Sdk.Messages;
 using System.Net.Sockets;
+using System.Configuration;
 
 namespace Roy.CRMConsole
 {
@@ -19,31 +20,58 @@ namespace Roy.CRMConsole
         /// <param name="connectionString"></param>
         /// <remarks>Both CrmServiceClient and OrganizationWebProxyClient implements IOrganizationService
         /// OrganizationWebProxyClient is not disposable and should only be used if the code uses early bound classes. In that case we need
-        /// OrganizationWebProxyClient to generate the context object. if your application uses late bound using disposable CrmServiceClient is sufficient</remarks>
+        /// CrmClientService to generate the context object. if your application uses late bound using disposable CrmServiceClient is sufficient</remarks>
 
-        public static IOrganizationService Connect(string connectionString)
-        {
-            CrmServiceClient crmServiceClient = new CrmServiceClient(connectionString);
+        public static IOrganizationService ConnectionWithCredentials()
+        { 
 
-            return crmServiceClient.OrganizationWebProxyClient != null ? crmServiceClient.OrganizationWebProxyClient as IOrganizationService
-                : throw new Exception("Failed to Create Connection");
+            Uri serviceUri = new Uri("https://roy.crm8.dynamics.com");
+            string userName = "";
+            string password = "";
+
+            string conn = $@"
+            Url = {serviceUri};
+            AuthType = OAuth;
+            UserName = {userName};
+            Password = {password};
+            AppId = 51f81489-12ee-4a9e-aaae-a2591f45987d;
+            RedirectUri = app://58145B91-0C36-4500-8554-080854F2AC97;
+            LoginPrompt=Auto;
+            RequireNewInstance = True";
+
+            var service = new CrmServiceClient(conn);
+
+            return service;
 
         }
 
-        public void ConnectionWithClientSecret()
-        {
-            string clientId = "";
-            string clientSecret = "";
-            string dataverseURL = "";
+        /// <summary>
+        /// for this code to run install Microsoft.CrmSdk.XrmTooling.CoreAssembly from nuget org
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <remarks>Both CrmServiceClient and OrganizationWebProxyClient implements IOrganizationService
+        /// OrganizationWebProxyClient is not disposable and should only be used if the code uses early bound classes. In that case we need
+        /// OrganizationWebProxyClient to generate the context object. if your application uses late bound using disposable CrmServiceClient is sufficient</remarks>
 
-            string connectionString = $"AuthType=ClientSecret;" + // more on https://docs.microsoft.com/en-us/powerapps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect#connection-string-parameters 
-                                   $"url={dataverseURL};" +
-                                   $"ClientId={clientId};" +
-                                   $"ClientSecret={clientSecret};" +
-                                   $"RequireNewInstance=false;";
+        public static IOrganizationService ConnectionWithClientSecret()
+        {
+            string organizationUri = ConfigurationManager.AppSettings["organizationURL"].ToString();
+            string clientId = ConfigurationManager.AppSettings["organizationURL"].ToString();
+            string clientSecret = ConfigurationManager.AppSettings["organizationURL"].ToString();
+            CrmServiceClient connection = new CrmServiceClient($@"AuthType=ClientSecret;url={organizationUri};ClientId={clientId};ClientSecret={clientSecret}");
+
+            return connection.OrganizationWebProxyClient != null ? connection.OrganizationWebProxyClient : (IOrganizationService)connection.OrganizationServiceProxy;
         }
         static void Main(string[] args)
         {
+            IOrganizationService service = ConnectionWithClientSecret();
+            try
+            {
+
+            }catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
         
     }
