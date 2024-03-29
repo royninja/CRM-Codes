@@ -11,5 +11,10 @@ namespace Roy.CRMConsole
         static void Main(string[] args)
         {
         }
+
+        public void ConnectionWithClientSecret()
+        {
+
+        }
     }
 }
