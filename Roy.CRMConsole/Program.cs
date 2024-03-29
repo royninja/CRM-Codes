@@ -57,7 +57,7 @@ namespace Roy.CRMConsole
         {
             string organizationUri = ConfigurationManager.AppSettings["organizationURL"].ToString();
             string clientId = ConfigurationManager.AppSettings["organizationURL"].ToString();
-            string clientSecret = ConfigurationManager.AppSettings["organizationURL"].ToString();
+            string clientSecret = ConfigurationManager.AppSettings["organizationURL"].ToString(); //valid for 6 months
             CrmServiceClient connection = new CrmServiceClient($@"AuthType=ClientSecret;url={organizationUri};ClientId={clientId};ClientSecret={clientSecret}");
 
             return connection.OrganizationWebProxyClient != null ? connection.OrganizationWebProxyClient : (IOrganizationService)connection.OrganizationServiceProxy;
