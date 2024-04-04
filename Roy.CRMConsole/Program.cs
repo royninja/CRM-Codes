@@ -12,7 +12,7 @@ using System.Configuration;
 
 namespace Roy.CRMConsole
 {
-    internal class Program
+    internal class Program : HelperLibrary
     {
         /// <summary>
         /// for this code to run install Microsoft.CrmSdk.XrmTooling.CoreAssembly from nuget org
@@ -64,11 +64,15 @@ namespace Roy.CRMConsole
         }
         static void Main(string[] args)
         {
-            IOrganizationService service = ConnectionWithClientSecret();
+            //IOrganizationService service = ConnectionWithClientSecret();
             try
             {
-
-            }catch (Exception ex)
+                DateTime start = new DateTime(2024, 4, 3, 17, 0, 0);
+                DateTime end = new DateTime(2024, 4, 4, 17, 30, 0);
+                double businessHours = CalculateBusinessHours(start, end);
+                Console.WriteLine($"Business hours between {start} and {end}: {businessHours} hours");
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
